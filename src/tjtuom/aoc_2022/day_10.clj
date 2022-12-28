@@ -48,6 +48,34 @@
        (map signal-strength)
        (reduce +)))
 
+(defn print-crt [grid]
+  (println (str/join \newline (map str/join grid))))
+
+(defn init-crt []
+  (vec (repeat 6 (vec (repeat 40 \.)))))
+
+(defn pixel-coords [i]
+  [(quot i 40) (rem i 40)])
+
+(defn lit-pixel? [[_ x] register]
+  (or (= x register)
+      (= (dec x) register)
+      (= (inc x) register)))
+
+(defn update-crt [grid [i register]]
+  (let [p (pixel-coords i)]
+    (if (lit-pixel? p register)
+      (assoc-in grid p \#)
+      (assoc-in grid p \.))))
+
+(defn part-two [input]
+  (->> input
+       parse-input
+       cycles
+       (map-indexed vector)
+       (reduce update-crt (init-crt))
+       (print-crt)))
+
 (def TEST_INPUT (slurp (io/resource "inputs/day_10_test.txt")))
 
 (deftest part-one-test
